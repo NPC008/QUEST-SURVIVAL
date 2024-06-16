@@ -29,6 +29,7 @@
         <label for="start-no">No</label><br>
         <button id="start-button">Start</button>
     </div>
+    <p id="end-text" class="hidden">Ok that's the best way to survive the game.</p>
 
     <div id="rounds">
 
@@ -155,7 +156,7 @@
     
     <div class="round hidden" id="round-10">
         <h2>Round 10</h2>
-        <p>There's a fancy BUILDING in front of you and it reads - UNIVERSITY OF ASIA PACIFIC.</p>
+        <p>There's a fancy BUILDING in front of you and it reads - <br>HALL NPC<br></p>
         <input type="radio" id="round-10-choice-A" name="round-10-choice" value="A">
         <label for="round-10-choice-A">Enter the building.</label><br>
         <input type="radio" id="round-10-choice-B" name="round-10-choice" value="B">
@@ -164,7 +165,7 @@
         <p class="result hidden"></p>
     </div>
 
-    <!-- Add similar HTML for rounds 4 to 10 -->
+    
 
     <div id="end-game" class="hidden">
         <h2>With this the BETA version of the game has reached its END!</h2>
@@ -180,39 +181,39 @@
             1: {
                 A: "You ran through the door as fast as you could only to get smashed by a BURNING pillar. <br>GAME OVER!",
                 B: "You panic and jump out of the window landing on a car surviving the event.",
-                C: "It's OK, you had no hope. GAME OVER!",
-                D: "You call the emergency number and..... HOW did you manage to give them the WRONG address?! GAME OVER!"
+                C: "It's OK, you had no hope. <br>GAME OVER!",
+                D: "You call the emergency number and..... HOW did you manage to give them the WRONG address?! <br>GAME OVER!"
             },
             2: {
-                A: "As you move closer to them you realize something's strange....ARE THOSE ZOMBIES!? You try to run but slip on a pebble and the zombies catch you. GAME OVER!",
-                B: "You try to put the fire out and lose consciousness because of heat stroke after 20 minutes. GAME OVER!",
+                A: "As you move closer to them you realize something's strange....ARE THOSE ZOMBIES!? <br>You try to run but slip on a pebble and the zombies catch you. <br>GAME OVER!",
+                B: "You try to put the fire out and lose consciousness because of heat stroke after 20 minutes. <br>GAME OVER!",
                 C: "You call out to the group for help but.... their movements seem unusual and you notice that those are ZOMBIES and you run for your life towards the city!",
-                D: "You call the emergency number and..... how did you manage to give them the wrong address?! GAME OVER!"
+                D: "You call the emergency number and..... how did you manage to give them the wrong address?! <br>GAME OVER!"
             },
             3: {
-                A: "You decide to look around and realize that you got SURROUNDED by the HORDE! GAME OVER!",
-                B: "Relaxing a bit, you think about the current situation and suddenly feel your NECK!!! GAME OVER!",
+                A: "You decide to look around and realize that you got SURROUNDED by the HORDE! <br>GAME OVER!",
+                B: "Relaxing a bit, you think about the current situation and suddenly feel your NECK!!! <br>GAME OVER!",
                 C: "You enter a small abandoned dwelling.",
-                D: "You call the emergency number, someone picked up and.... UWUGAUAAAA!!! The sudden jumpscare gives you a heart attack. RIP. GAME OVER!"
+                D: "You call the emergency number, someone picked up and.... UWUGAUAAAA!!! <br>The sudden jumpscare gives you a heart attack. RIP. <br>GAME OVER!"
             },
             4: {
                A: "You find a STRANGE looking DIARY.",
                B: "You decide to ignore the drawer BUT end up checking it out anyways and find a DIARY."
             },
             5: {
-               A: "Roses Are Red<br>Violets Are Blue<br>This Presentation Is So Dull<br>Please Don't Continue....<br><br>What was that?...",
+               A: "Roses Are Red<br>Violets Are Blue<br>Hide in a corner<br>Hope they won't find you<br><br>....",
                B: "Thinking poems are for kids, you throw it away...what a shame."
             },
             6: {
-               A: "You hide in a corner and wait for them to leave BUT soon the room gets filled with Zombies. GAME OVER!",
+               A: "You hide in a corner and wait for them to leave BUT soon the room gets filled with Zombies. <br>GAME OVER!",
                B: "The best course of action you thought was to run and Guess what? Now there's a HUGE horde of ZOMBIES chasing you.",
-               C: "Feeling all happy happy you rush outside and.... the group wasn't of quite a friendly species... How did you manage to survive this long? GAME OVER!"
+               C: "Feeling all happy happy you rush outside and.... the group wasn't of quite a friendly species... <br>How did you manage to survive this long? <br>GAME OVER!"
             },
             7: {
-               A: "With all your might you run to the car, get inside, AND!!!.... there's no key. RIP. GAME OVER!",
-               B: "Remembering about the STORY of the two friends and a bear, you fall to the ground and act dead... The zombies LAUGH at your intelligence. GAME OVER!",
-               C: "Thinking you can shake off the horde you enter the alley on the right and.... it's a dead end. GAME OVER!",
-               D: "Addressing the car as insignificant, you run at full speed but FALL into a manhole. Luckily the zombies didn't notice and lost you."
+               A: "With all your might you run to the car, get inside, AND!!!.... there's no key. RIP. <br>GAME OVER!",
+               B: "Remembering about the STORY of the two friends and a bear, you fall to the ground and act dead... The zombies LAUGH at your intelligence. <br>GAME OVER!",
+               C: "Thinking you can shake off the horde you enter the alley on the right and.... it's a dead end. <br>GAME OVER!",
+               D: "Addressing the car as insignificant, you run at full speed but FALL into a manhole. <br>Luckily the zombies didn't notice and lost you."
             },
             8: {
                A: "Laughing at the situation you take in the scenery....and regret it right after.",
@@ -225,10 +226,10 @@
                B: "Nah you still went for the EXIT."
             },
             10: {
-                A: "You try to enter the building but... You don't have An ID CARD!",
+                A: "You try to enter the building but... You don't have An ID CARD!<br>But wait... are those survivors inside!",
                 B: "For some reason you DECLINE to enter the building and decided to move to another location."
             },
-            // Include messages for rounds 4 to 10
+            
         };
 
         let currentRound = 0;
@@ -311,7 +312,7 @@
     }
 
     delayShow(document.getElementById('welcome-text'), 1000);
-    delayShow(startChoice, 3000);
+    delayShow(startChoice, 2000);
     </script>
 </body>
 </html>
