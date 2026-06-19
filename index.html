@@ -1,321 +1,351 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Game</title>
-    <style>
-        .hidden {
-            display: none;
-        }
-        .round {
-            margin: 20px;
-        }
-        .result {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <div id="welcome-text">
-        <h1>Welcome to <br>QUEST: SURVIVAL!</h1>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Share+Tech+Mono&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+#qs-root{
+  font-family:'Share Tech Mono',monospace;
+  background:#0A0A0F;
+  color:#E8E6E0;
+  min-height:600px;
+  padding:24px 20px;
+  position:relative;
+  overflow:hidden;
+  border-radius:12px;
+}
+#qs-root::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
+  pointer-events:none;z-index:0;
+}
+.qs-panel{position:relative;z-index:1}
+
+.qs-hud{
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid #2a2a35;
+  padding-bottom:12px;margin-bottom:20px;
+}
+.qs-hud-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#8B8B8B}
+.qs-hud-val{font-size:14px;color:#E8E6E0;font-weight:bold}
+
+.qs-progress-bar{height:3px;background:#1a1a22;border-radius:2px;margin-bottom:24px;overflow:hidden}
+.qs-progress-fill{height:100%;background:#39FF14;border-radius:2px;transition:width 0.5s ease}
+
+.title-screen{text-align:center;padding:40px 0}
+.title-screen h1{
+  font-family:'Creepster',cursive;
+  font-size:58px;letter-spacing:4px;
+  color:#C0392B;
+  text-shadow:0 0 20px rgba(192,57,43,0.4);
+  line-height:1.1;margin-bottom:6px;
+}
+.title-screen .subtitle{font-size:11px;color:#8B8B8B;letter-spacing:3px;margin-bottom:32px}
+.crt-badge{display:inline-block;border:1px solid #2a2a35;padding:4px 12px;font-size:11px;color:#555;letter-spacing:2px;margin-bottom:36px}
+
+.start-box{border:1px solid #2a2a35;padding:20px;max-width:360px;margin:0 auto;background:#0d0d14}
+.start-box p{font-size:13px;color:#8B8B8B;margin-bottom:16px;letter-spacing:1px}
+.qs-btn-row{display:flex;gap:10px;justify-content:center}
+
+button.qs-btn{
+  font-family:'Share Tech Mono',monospace;
+  background:transparent;border:1px solid #C0392B;
+  color:#C0392B;padding:10px 28px;font-size:13px;
+  letter-spacing:2px;cursor:pointer;transition:all 0.2s;
+}
+button.qs-btn:hover{background:#C0392B;color:#0A0A0F}
+button.qs-btn.secondary{border-color:#2a2a35;color:#8B8B8B}
+button.qs-btn.secondary:hover{background:#2a2a35;color:#E8E6E0}
+button.qs-btn.green{border-color:#39FF14;color:#39FF14}
+button.qs-btn.green:hover{background:#39FF14;color:#0A0A0F}
+button.qs-btn:disabled{opacity:0.3;cursor:not-allowed}
+
+.round-label{font-size:11px;color:#8B8B8B;letter-spacing:3px;margin-bottom:8px}
+.round-question{
+  font-size:16px;color:#E8E6E0;line-height:1.6;
+  border-left:3px solid #C0392B;padding-left:14px;margin-bottom:20px;
+}
+
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.choice-item{
+  display:flex;align-items:flex-start;gap:12px;
+  border:1px solid #2a2a35;padding:12px 14px;
+  cursor:pointer;transition:all 0.2s;background:#0d0d14;
+}
+.choice-item:hover{border-color:#C0392B;background:#130d0d}
+.choice-item.selected{border-color:#C0392B;background:#130d0d}
+.choice-key{font-size:11px;color:#C0392B;letter-spacing:1px;min-width:20px;padding-top:1px}
+.choice-text{font-size:13px;color:#E8E6E0;line-height:1.5}
+
+.result-box{
+  border:1px solid;padding:16px;margin-bottom:12px;
+  font-size:13px;line-height:1.7;
+  opacity:0;transition:opacity 0.4s;
+}
+.result-box.survive{border-color:#39FF14;color:#39FF14;background:rgba(57,255,20,0.04)}
+.result-box.die{border-color:#C0392B;color:#C0392B;background:rgba(192,57,43,0.06)}
+.result-box.show{opacity:1}
+
+.separator{height:1px;background:#1a1a22;margin:20px 0}
+
+.game-over-screen{text-align:center;padding:40px 20px}
+.game-over-screen h1{
+  font-family:'Creepster',cursive;font-size:56px;
+  color:#C0392B;text-shadow:0 0 30px rgba(192,57,43,0.5);
+  letter-spacing:4px;margin-bottom:8px;
+}
+.go-detail{font-size:13px;color:#8B8B8B;margin:10px 0 6px;letter-spacing:1px}
+.go-flavor{font-size:12px;color:#555;margin-bottom:28px;line-height:1.8;max-width:360px;margin-left:auto;margin-right:auto}
+
+.win-screen{text-align:center;padding:40px 20px}
+.win-screen h1{
+  font-family:'Creepster',cursive;font-size:52px;
+  color:#39FF14;text-shadow:0 0 30px rgba(57,255,20,0.4);
+  letter-spacing:3px;margin-bottom:8px;
+}
+.credits{font-size:11px;color:#555;letter-spacing:1px;margin-top:32px}
+.credits span{color:#39FF14}
+
+.flash{animation:flashred 0.15s ease 3}
+@keyframes flashred{0%,100%{opacity:1}50%{opacity:0.2}}
+</style>
+
+<div id="qs-root">
+
+<div id="screen-title" class="qs-panel title-screen">
+  <div class="crt-badge">[ BETA v1.0 ]</div>
+  <h1>QUEST</h1>
+  <div class="subtitle">S U R V I V A L</div>
+  <div class="separator"></div>
+  <div class="start-box">
+    <p>&gt; INITIALIZE SURVIVAL PROTOCOL?</p>
+    <div class="qs-btn-row">
+      <button class="qs-btn green" onclick="startGame()">YES — PLAY</button>
+      <button class="qs-btn secondary" onclick="showCoward()">NO</button>
     </div>
-    <div id="start-choice" class="hidden">
-        <p>Do you want to start the game?</p>
-        <input type="radio" id="start-yes" name="start" value="Y">
-        <label for="start-yes">Yes</label><br>
-        <input type="radio" id="start-no" name="start" value="N">
-        <label for="start-no">No</label><br>
-        <button id="start-button">Start</button>
-    </div>
-    <p id="end-text" class="hidden">Ok that's the best way to survive the game.</p>
+  </div>
+</div>
 
-    <div id="rounds">
+<div id="screen-coward" class="qs-panel" style="display:none;text-align:center;padding:60px 20px">
+  <p style="font-size:13px;color:#8B8B8B;letter-spacing:2px">Smart. Staying home is literally the best survival strategy.</p>
+  <br>
+  <button class="qs-btn" onclick="location.reload()">RECONSIDER</button>
+</div>
 
-    <div class="round hidden" id="round-1">
-        <h2>Round 1</h2>
-        <p>Your house is on fire! What will you do?</p>
-        <input type="radio" id="r1a" name="choice1" value="A">
-        <label for="r1a">Trust your luck and run for it</label><br>
-        <input type="radio" id="r1b" name="choice1" value="B">
-        <label for="r1b">Jump out of the window</label><br>
-        <input type="radio" id="r1c" name="choice1" value="C">
-        <label for="r1c">Finish your lunch</label><br>
-        <input type="radio" id="r1d" name="choice1" value="D">
-        <label for="r1d">Call the emergency number</label><br>
-        <button class="next-button">Next</button>
-        <p class="result hidden"></p>
-    </div>
+<div id="screen-game" class="qs-panel" style="display:none">
+  <div class="qs-hud">
+    <div class="qs-hud-item">ROUND <span class="qs-hud-val" id="hud-round">1 / 10</span></div>
+    <div class="qs-hud-item">SCORE <span class="qs-hud-val" id="hud-score">0</span></div>
+  </div>
+  <div class="qs-progress-bar"><div class="qs-progress-fill" id="progress-fill" style="width:0%"></div></div>
 
-    <div class="round hidden" id="round-2">
-        <h2>Round 2</h2>
-        <p>You see a group of people. What will you do?</p>
-        <input type="radio" id="r2a" name="choice2" value="A">
-        <label for="r2a">Move closer to them</label><br>
-        <input type="radio" id="r2b" name="choice2" value="B">
-        <label for="r2b">Try to put out the fire</label><br>
-        <input type="radio" id="r2c" name="choice2" value="C">
-        <label for="r2c">Call out to them for help</label><br>
-        <input type="radio" id="r2d" name="choice2" value="D">
-        <label for="r2d">Call the emergency number</label><br>
-        <button class="next-button">Next</button>
-        <p class="result hidden"></p>
-        </div>
+  <div class="round-label" id="round-label">ROUND 1 — SITUATION REPORT</div>
+  <div class="round-question" id="round-question"></div>
+  <div class="choices" id="choices-container"></div>
+  <div class="result-box" id="result-box"></div>
 
-    <div class="round hidden" id="round-3">
-        <h2>Round 3</h2>
-        <p>As you reach the city, you find out that it's flooding with zombies.</p>
-        <input type="radio" id="r3a" name="choice3" value="A">
-        <label for="r3a">A. Roam around the streets</label><br>
-        <input type="radio" id="r3b" name="choice3" value="B">
-        <label for="r3b">B. Sit back and collect your thoughts</label><br>
-        <input type="radio" id="r3c" name="choice3" value="C">
-        <label for="r3c">C. Take shelter in a nearest building</label><br>
-        <input type="radio" id="r3d" name="choice3" value="D">
-        <label for="r3d">D. Dial the emergency number and ask for help</label><br>
-        <button class="next-button">Next</button>
-        <p class="result hidden"></p>
-    </div>
+  <div style="display:flex;justify-content:flex-end">
+    <button class="qs-btn" id="next-btn" onclick="submitChoice()" disabled>CONFIRM &gt;</button>
+  </div>
+</div>
 
-    <div class="round hidden" id="round-4">
-        <h2>Round 4</h2>
-        <p>You enter a room and find a drawer.</p>
-        <input type="radio" id="round-4-choice-A" name="round-4-choice" value="A">
-        <label for="round-4-choice-A">Look into it.</label><br>
-        <input type="radio" id="round-4-choice-B" name="round-4-choice" value="B">
-        <label for="round-4-choice-B">Nope.</label><br>
-        <button type="button" class="next-button">Next</button>
-        <p class="result hidden"></p>
-    </div>
-    
-    <div class="round hidden" id="round-5">
-        <h2>Round 5</h2>
-        <p>It looks like the diary has a poem...</p>
-        <input type="radio" id="round-5-choice-A" name="round-5-choice" value="A">
-        <label for="round-5-choice-A">Read it.</label><br>
-        <input type="radio" id="round-5-choice-B" name="round-5-choice" value="B">
-        <label for="round-5-choice-B">Nah, I hate poems.</label><br>
-        <button type="button" class="next-button">Next</button>
-        <p class="result hidden"></p>
-    </div>
-    
-    <div class="round hidden" id="round-6">
-        <h2>Round 6</h2>
-        <p>You hear footsteps outside. They might probably be the survivors.</p>
-        <input type="radio" id="round-6-choice-A" name="round-6-choice" value="A">
-        <label for="round-6-choice-A">Hide in a corner.</label><br>
-        <input type="radio" id="round-6-choice-B" name="round-6-choice" value="B">
-        <label for="round-6-choice-B">Run through the back door.</label><br>
-        <input type="radio" id="round-6-choice-C" name="round-6-choice" value="C">
-        <label for="round-6-choice-C">Go and join them.</label><br>
-        <button type="button" class="next-button">Next</button>
-        <p class="result hidden"></p>
-    </div>
-    
-    <div class="round hidden" id="round-7">
-        <h2>Round 7</h2>
-        <p>After 5 minutes of being chased down the streets you spot an abandoned car.</p>
-        <input type="radio" id="round-7-choice-A" name="round-7-choice" value="A">
-        <label for="round-7-choice-A">Get the car.</label><br>
-        <input type="radio" id="round-7-choice-B" name="round-7-choice" value="B">
-        <label for="round-7-choice-B">Fall down and act dead.</label><br>
-        <input type="radio" id="round-7-choice-C" name="round-7-choice" value="C">
-        <label for="round-7-choice-C">Take the alley to the right.</label><br>
-        <input type="radio" id="round-7-choice-D" name="round-7-choice" value="D">
-        <label for="round-7-choice-D">Forget the car! I can run FASTER!</label><br>
-        <button type="button" class="next-button">Next</button>
-        <p class="result hidden"></p>
-    </div>
-    
-    <div class="round hidden" id="round-8">
-        <h2>Round 8</h2>
-        <p>You suddenly feel blessed to have the opportunity to fall in a sewerage.</p>
-        <input type="radio" id="round-8-choice-A" name="round-8-choice" value="A">
-        <label for="round-8-choice-A">Take a moment and enjoy the view, then move forward.</label><br>
-        <input type="radio" id="round-8-choice-B" name="round-8-choice" value="B">
-        <label for="round-8-choice-B">Get up and take the left route.</label><br>
-        <input type="radio" id="round-8-choice-C" name="round-8-choice" value="C">
-        <label for="round-8-choice-C">Get up and take the right route.</label><br>
-        <input type="radio" id="round-8-choice-D" name="round-8-choice" value="D">
-        <label for="round-8-choice-D">Take a dip.</label><br>
-        <button type="button" class="next-button">Next</button>
-        <p class="result hidden"></p>
-    </div>
-    
-    <div class="round hidden" id="round-9">
-        <h2>Round 9</h2>
-        <p>After walking for a while you spot a LADDER to exit.</p>
-        <input type="radio" id="round-9-choice-A" name="round-9-choice" value="A">
-        <label for="round-9-choice-A">Take the ladder and get yourself out of here.</label><br>
-        <input type="radio" id="round-9-choice-B" name="round-9-choice" value="B">
-        <label for="round-9-choice-B">Pretend you didn't see it and move forward.</label><br>
-        <button type="button" class="next-button">Next</button>
-        <p class="result hidden"></p>
-    </div>
-    
-    <div class="round hidden" id="round-10">
-        <h2>Round 10</h2>
-        <p>There's a fancy BUILDING in front of you and it reads - <br>HALL NPC<br></p>
-        <input type="radio" id="round-10-choice-A" name="round-10-choice" value="A">
-        <label for="round-10-choice-A">Enter the building.</label><br>
-        <input type="radio" id="round-10-choice-B" name="round-10-choice" value="B">
-        <label for="round-10-choice-B">NOPE! not going in there.</label><br>
-        <button type="button" class="next-button">Next</button>
-        <p class="result hidden"></p>
-    </div>
+<div id="screen-gameover" class="qs-panel game-over-screen" style="display:none">
+  <h1>GAME OVER</h1>
+  <div class="go-detail" id="go-score"></div>
+  <div class="go-flavor" id="go-flavor"></div>
+  <div class="separator"></div>
+  <button class="qs-btn green" onclick="location.reload()">TRY AGAIN &gt;</button>
+</div>
 
-    
+<div id="screen-win" class="qs-panel win-screen" style="display:none">
+  <h1>YOU SURVIVED</h1>
+  <p style="font-size:13px;color:#8B8B8B;margin:10px 0 28px;letter-spacing:1px" id="win-score"></p>
+  <p style="font-size:12px;color:#555;margin-bottom:28px;line-height:1.8;max-width:320px;margin:0 auto 28px">Against all odds — and some questionable decisions — you made it out alive.</p>
+  <button class="qs-btn green" onclick="location.reload()">PLAY AGAIN &gt;</button>
+  <div class="credits">DEVELOPED BY <span>NAFIS AHMED ANIK</span></div>
+</div>
 
-    <div id="end-game" class="hidden">
-        <h2>With this the BETA version of the game has reached its END!</h2>
-        <p>THANK YOU FOR PLAYING OUR GAME!</p>
-        <p>WE HOPE YOU ENJOYED IT!... probably</p>
-        <h2>DEVELOPERS:</h2>
-        <p>Nafis Ahmed Anik</p>
-        <p>(\__/)</p>
-        <p>( *_*)</p>
-        <p>/>  <\</p>
-    </div>
+</div>
 
-    <script>
-        
-        const roundMessages = {
-            1: {
-                A: "You ran through the door as fast as you could only to get smashed by a BURNING pillar. <br>GAME OVER!",
-                B: "You panic and jump out of the window landing on a car surviving the event.",
-                C: "It's OK, you had no hope. <br>GAME OVER!",
-                D: "You call the emergency number and..... <br>HOW did you manage to give them the WRONG address?! <br>GAME OVER!"
-            },
-            2: {
-                A: "As you move closer to them you realize something's strange....ARE THOSE ZOMBIES!? <br>You try to run but slip on a pebble and the zombies catch you. <br>GAME OVER!",
-                B: "You try to put the fire out and lose consciousness because of heat stroke after 20 minutes. <br>GAME OVER!",
-                C: "You call out to the group for help but.... <br>their movements seem unusual and you notice that those are ZOMBIES!<br>you run for your life towards the city!",
-                D: "You call the emergency number and..... how did you manage to give them the wrong address?! <br>GAME OVER!"
-            },
-            3: {
-                A: "You decide to look around and realize that you got SURROUNDED by the HORDE! <br>GAME OVER!",
-                B: "Relaxing a bit, you think about the current situation and suddenly feel your NECK!!! <br>GAME OVER!",
-                C: "You enter a small abandoned dwelling.",
-                D: "You call the emergency number, someone picked up and.... <br>UWUGAUAAAA!!! <br>The sudden jumpscare gives you a heart attack. RIP. <br>GAME OVER!"
-            },
-            4: {
-               A: "You find a STRANGE looking DIARY.",
-               B: "You decide to ignore the drawer <br>BUT end up checking it out anyways and find a DIARY."
-            },
-            5: {
-               A: "Roses Are Red<br>Violets Are Blue<br>Hide in a corner<br>Hope they won't find you<br><br>....",
-               B: "Thinking poems are for kids, you throw it away...<br>what a shame."
-            },
-            6: {
-               A: "You hide in a corner and wait for them to leave BUT soon the room gets filled with Zombies. <br>GAME OVER!",
-               B: "The best course of action you thought was to run and Guess what? <br>Now there's a HUGE horde of ZOMBIES chasing you.",
-               C: "Feeling all happy happy you rush outside and.... <br>the group wasn't of quite a friendly species... <br>How did you manage to survive this long? <br>GAME OVER!"
-            },
-            7: {
-               A: "With all your might you run to the car, get inside, AND!!!.... there's no key. RIP. <br>GAME OVER!",
-               B: "Remembering about the STORY of the two friends and a bear, you fall to the ground and act dead... The zombies LAUGH at your intelligence. <br>GAME OVER!",
-               C: "Thinking you can shake off the horde you enter the alley on the right and.... it's a dead end. <br>GAME OVER!",
-               D: "Addressing the car as insignificant, you run at full speed but FALL into a manhole. <br>Luckily the zombies didn't notice and lost you."
-            },
-            8: {
-               A: "Laughing at the situation you take in the scenery....and regret it right after.",
-               B: "You took the left route....which took you an hour to decide. How are you still alive?",
-               C: "You took the right route....which took you an hour to decide. How are you still alive?",
-               D: "You JUMP in the.... why'd you do that? <br>Now you smell.<br>GAME OVER!"
-            },
-            9: {
-               A: "Though the brightness outside was blinding, you feel refreshed.",
-               B: "Nah you still went for the EXIT."
-            },
-            10: {
-                A: "You try to enter the building but... You don't have An ID CARD!<br>But wait... are those survivors inside!",
-                B: "For some reason you DECLINE to enter the building and decided to move to another location."
-            },
-            
-        };
+<script>
+const rounds=[
+  {q:"Your house is on fire! What will you do?",choices:[
+    {k:"A",t:"Trust your luck and run for it"},
+    {k:"B",t:"Jump out of the window"},
+    {k:"C",t:"Finish your lunch"},
+    {k:"D",t:"Call the emergency number"}
+  ],answers:{
+    A:{msg:"You bolt through the door and a BURNING pillar smashes down on you.",survive:false},
+    B:{msg:"You panic and leap from the window — somehow land on a car and walk away. Lucky.",survive:true},
+    C:{msg:"It was a good lunch. Rest in peace.",survive:false},
+    D:{msg:"You call — and somehow give them the wrong address. How.",survive:false}
+  }},
+  {q:"You see a group of people nearby. What will you do?",choices:[
+    {k:"A",t:"Move closer to them"},
+    {k:"B",t:"Try to put out the fire"},
+    {k:"C",t:"Call out to them for help"},
+    {k:"D",t:"Call the emergency number again"}
+  ],answers:{
+    A:{msg:"Closer... closer... THOSE AREN'T PEOPLE. You slip on a pebble and that's that.",survive:false},
+    B:{msg:"You fight the fire heroically for 20 minutes and collapse from heat stroke.",survive:false},
+    C:{msg:"You yell for help. Their movements are wrong. ZOMBIES. You sprint toward the city.",survive:true},
+    D:{msg:"Wrong address. Again. Unbelievable.",survive:false}
+  }},
+  {q:"As you reach the city, it's flooded with zombies.",choices:[
+    {k:"A",t:"Roam around the streets"},
+    {k:"B",t:"Sit back and collect your thoughts"},
+    {k:"C",t:"Take shelter in the nearest building"},
+    {k:"D",t:"Dial emergency and ask for help"}
+  ],answers:{
+    A:{msg:"You decide to take a walk. Immediately surrounded. Rookie mistake.",survive:false},
+    B:{msg:"You pause to reflect. A zombie uses the opportunity to reflect on your neck.",survive:false},
+    C:{msg:"You duck into a small abandoned dwelling. Dark, dusty, quiet. Safe — for now.",survive:true},
+    D:{msg:"Someone picks up. 'UWUGAUAAAA!!!' The jumpscare gives you a heart attack. RIP.",survive:false}
+  }},
+  {q:"You enter a room and find a drawer.",choices:[
+    {k:"A",t:"Look into it"},
+    {k:"B",t:"Nope."}
+  ],answers:{
+    A:{msg:"You find a STRANGE looking DIARY inside.",survive:true},
+    B:{msg:"You decide to ignore it — then check it anyway. Found a DIARY.",survive:true}
+  }},
+  {q:"The diary has a poem in it...",choices:[
+    {k:"A",t:"Read it"},
+    {k:"B",t:"Nah, I hate poems."}
+  ],answers:{
+    A:{msg:"\"Roses Are Red / Violets Are Blue / Hide in a corner / Hope they won't find you\" ... interesting advice.",survive:true},
+    B:{msg:"Thinking poetry is beneath you, you throw the diary aside. Noted.",survive:true}
+  }},
+  {q:"You hear footsteps outside. They might be survivors.",choices:[
+    {k:"A",t:"Hide in a corner"},
+    {k:"B",t:"Run through the back door"},
+    {k:"C",t:"Go join them"}
+  ],answers:{
+    A:{msg:"You wait in the corner. The room slowly fills with zombies. Not survivors.",survive:false},
+    B:{msg:"You sprint out the back — and now there's a HUGE horde chasing you down the street.",survive:true},
+    C:{msg:"You rush outside, excited to meet your new friends. They are not your friends.",survive:false}
+  }},
+  {q:"After 5 minutes of being chased, you spot an abandoned car.",choices:[
+    {k:"A",t:"Get the car"},
+    {k:"B",t:"Fall down and act dead"},
+    {k:"C",t:"Take the alley to the right"},
+    {k:"D",t:"Forget the car — I can run FASTER!"}
+  ],answers:{
+    A:{msg:"You reach the car, get in, and... no key. RIP.",survive:false},
+    B:{msg:"You drop to the ground. The zombies laugh. That only works on bears.",survive:false},
+    C:{msg:"Smart move — except it's a dead end. Literally.",survive:false},
+    D:{msg:"You sprint at full speed, feeling heroic — and fall straight into a manhole. Zombies lose you.",survive:true}
+  }},
+  {q:"You find yourself in a sewerage system. You feel strangely grateful.",choices:[
+    {k:"A",t:"Take a moment and enjoy the view, then move forward"},
+    {k:"B",t:"Get up and take the left route"},
+    {k:"C",t:"Get up and take the right route"},
+    {k:"D",t:"Take a dip."}
+  ],answers:{
+    A:{msg:"You appreciate the ambiance of the sewer. A choice you immediately regret. But you move on.",survive:true},
+    B:{msg:"You take the left route. It took an hour to decide. How are you still alive?",survive:true},
+    C:{msg:"You take the right route. It took an hour to decide. Honestly impressive.",survive:true},
+    D:{msg:"You JUMP IN. Now you smell. The zombie horde abandons you out of sheer disgust.",survive:false}
+  }},
+  {q:"After walking a while, you spot a LADDER leading out.",choices:[
+    {k:"A",t:"Climb it and get out of here"},
+    {k:"B",t:"Pretend you didn't see it and keep going"}
+  ],answers:{
+    A:{msg:"The brightness outside is blinding but the fresh air hits different. You feel refreshed.",survive:true},
+    B:{msg:"You ignore the ladder out of principle — then climb it anyway. Some choices make themselves.",survive:true}
+  }},
+  {q:"There's a fancy building in front of you. It reads: HALL NPC",choices:[
+    {k:"A",t:"Enter the building"},
+    {k:"B",t:"No. Not going in there."}
+  ],answers:{
+    A:{msg:"You try to enter... no ID card. But wait — are those SURVIVORS in there?",survive:true},
+    B:{msg:"You decline the building's invitation and head elsewhere into the unknown.",survive:true}
+  }}
+];
 
-        let currentRound = 0;
-        const startChoice = document.getElementById('start-choice');
-        const rounds = document.querySelectorAll('.round');
-        const endGame = document.getElementById('end-game');
-        const endText = document.getElementById('end-text');
-        const nextButtons = document.querySelectorAll('.next-button');
+let currentRound=0,score=0,selectedKey=null,processing=false;
 
-        function show(element) {
-            element.classList.remove('hidden');
-        }
+function showScreen(id){
+  ['screen-title','screen-coward','screen-game','screen-gameover','screen-win'].forEach(s=>{
+    document.getElementById(s).style.display='none';
+  });
+  document.getElementById(id).style.display='block';
+}
 
-        function hide(element) {
-            element.classList.add('hidden');
-        }
+function updateHUD(){
+  document.getElementById('hud-round').textContent=(currentRound+1)+' / 10';
+  document.getElementById('hud-score').textContent=score;
+  document.getElementById('progress-fill').style.width=((currentRound/10)*100)+'%';
+}
 
-        function startGame() {
-            hide(startChoice);
-            show(rounds[currentRound]);
-        }
+function loadRound(){
+  const r=rounds[currentRound];
+  document.getElementById('round-label').textContent='ROUND '+(currentRound+1)+' — SITUATION REPORT';
+  document.getElementById('round-question').textContent=r.q;
+  const cc=document.getElementById('choices-container');
+  cc.innerHTML='';
+  selectedKey=null;
+  document.getElementById('next-btn').disabled=true;
+  const rb=document.getElementById('result-box');
+  rb.className='result-box';rb.innerHTML='';
+  r.choices.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='choice-item';
+    div.dataset.key=c.k;
+    div.innerHTML=`<span class="choice-key">${c.k}</span><span class="choice-text">${c.t}</span>`;
+    div.onclick=()=>selectChoice(c.k);
+    cc.appendChild(div);
+  });
+  updateHUD();
+}
 
-        function nextRound() {
-            const currentRoundElement = rounds[currentRound];
-            const selectedChoice = currentRoundElement.querySelector('input[type="radio"]:checked');
+function selectChoice(k){
+  if(processing)return;
+  selectedKey=k;
+  document.querySelectorAll('.choice-item').forEach(el=>{
+    el.classList.toggle('selected',el.dataset.key===k);
+  });
+  document.getElementById('next-btn').disabled=false;
+}
 
-            if (!selectedChoice) {
-                alert('Please make a choice to proceed.');
-                return;
-            }
+function submitChoice(){
+  if(!selectedKey||processing)return;
+  processing=true;
+  document.getElementById('next-btn').disabled=true;
+  const ans=rounds[currentRound].answers[selectedKey];
+  const rb=document.getElementById('result-box');
+  rb.className='result-box '+(ans.survive?'survive':'die');
+  rb.innerHTML=ans.msg;
+  setTimeout(()=>rb.classList.add('show'),50);
 
-            const choiceValue = selectedChoice.value;
-            const resultText = currentRoundElement.querySelector('.result');
+  if(ans.survive) score+=100;
+  updateHUD();
 
-            const messages = roundMessages[currentRound + 1];
-            const message = messages[choiceValue];
+  if(!ans.survive){
+    document.getElementById('qs-root').classList.add('flash');
+    setTimeout(()=>document.getElementById('qs-root').classList.remove('flash'),500);
+  }
 
-            resultText.innerHTML = message;  // Use innerHTML to interpret <br> as line breaks
+  setTimeout(()=>{
+    rb.classList.remove('show');
+    setTimeout(()=>{
+      processing=false;
+      if(!ans.survive){
+        document.getElementById('go-score').textContent='REACHED ROUND '+(currentRound+1)+' / 10  |  SCORE: '+score;
+        document.getElementById('go-flavor').textContent=ans.msg;
+        showScreen('screen-gameover');
+        return;
+      }
+      currentRound++;
+      if(currentRound>=rounds.length){
+        document.getElementById('win-score').textContent='FINAL SCORE: '+score+' / 1000';
+        showScreen('screen-win');
+        return;
+      }
+      loadRound();
+    },400);
+  },3000);
+}
 
-            show(resultText);
-
-            setTimeout(() => {
-                hide(resultText);
-
-                if (message.includes('GAME OVER')) {
-                hide(currentRoundElement);
-                show(endGame);
-            } else {
-                hide(currentRoundElement);
-                currentRound++;
-                if (currentRound < rounds.length) {
-                    show(rounds[currentRound]);
-                } else {
-                    show(endGame);
-                }
-            }
-        }, 6000); // Adjust delay time as needed
-    }
-
-    document.getElementById('start-button').addEventListener('click', () => {
-        const selectedStartChoice = document.querySelector('input[name="start"]:checked');
-        if (selectedStartChoice && selectedStartChoice.value === 'Y') {
-            startGame();
-        } else if (selectedStartChoice && selectedStartChoice.value === 'N') {
-            hide(startChoice);
-            show(endText);
-        } else {
-            alert('Please make a choice to proceed.');
-        }
-    });
-
-    nextButtons.forEach(button => {
-        button.addEventListener('click', nextRound);
-    });
-
-    function delayShow(element, delay) {
-        setTimeout(() => {
-            show(element);
-        }, delay);
-    }
-
-    delayShow(document.getElementById('welcome-text'), 1000);
-    delayShow(startChoice, 2000);
-    </script>
-</body>
-</html>
+function startGame(){showScreen('screen-game');loadRound();}
+function showCoward(){showScreen('screen-coward');}
+</script>
